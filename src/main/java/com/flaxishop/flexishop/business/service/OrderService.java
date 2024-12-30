@@ -2,6 +2,7 @@ package com.flaxishop.flexishop.business.service;
 
 import com.flaxishop.flexishop.business.entity.Order;
 import com.flaxishop.flexishop.business.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,5 +42,11 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
         orderRepository.delete(order);
+    }
+
+    // Method to fetch an Order by its UUID
+    public Order getByUuid(String uuid) {
+        return orderRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("Order not found with UUID: " + uuid));
     }
 }

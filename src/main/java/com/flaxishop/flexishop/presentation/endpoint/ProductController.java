@@ -1,5 +1,9 @@
-import com.flaxishop.flexishop.business.entity.Product;
+package com.flaxishop.flexishop.presentation.controller;
+
 import com.flaxishop.flexishop.business.service.ProductService;
+import com.flaxishop.flexishop.presentation.dto.ProductDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,52 +13,41 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final ProductService productService;
+    @Autowired
+    private ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
-
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        try {
-            Product product = productService.getProductById(id);
-            return ResponseEntity.ok(product);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
+    // Create a new product
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        try {
-            return ResponseEntity.ok(productService.createProduct(product));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+        ProductDTO createdProduct = productService.createProduct(productDTO);
+        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
-        try {
-            return ResponseEntity.ok(productService.updateProduct(id, productDetails));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    // Get a product by ID
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
+        ProductDTO productDTO = productService.getProductById(productId);
+        return new ResponseEntity<>(productDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        try {
-            productService.deleteProduct(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    // Update an existing product
+    @PutMapping("/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductDTO productDTO) {
+        ProductDTO updatedProduct = productService.updateProduct(productId, productDTO);
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+    }
+
+    // Delete a product by ID
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Get all products
+    @GetMapping
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        List<ProductDTO> productDTOs = productService.getAllProducts();
+        return new ResponseEntity<>(productDTOs, HttpStatus.OK);
     }
 }

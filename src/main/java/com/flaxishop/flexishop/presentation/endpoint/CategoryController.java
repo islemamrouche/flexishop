@@ -1,7 +1,7 @@
 package com.flaxishop.flexishop.presentation.endpoint;
 
-import com.flaxishop.flexishop.business.entity.Category;
 import com.flaxishop.flexishop.business.service.CategoryService;
+import com.flaxishop.flexishop.presentation.dto.CategoryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,39 +17,44 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    // Get all categories
     @GetMapping
-    public List<Category> getAllCategories() {
+    public List<CategoryDTO> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
+    // Get category by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
         try {
-            Category category = categoryService.getCategoryById(id);
-            return ResponseEntity.ok(category);
+            CategoryDTO categoryDTO = categoryService.getCategoryById(id);
+            return ResponseEntity.ok(categoryDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Create a new category
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
         try {
-            return ResponseEntity.ok(categoryService.createCategory(category));
+            return ResponseEntity.ok(categoryService.createCategory(categoryDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
+    // Update an existing category
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
         try {
-            return ResponseEntity.ok(categoryService.updateCategory(id, categoryDetails));
+            return ResponseEntity.ok(categoryService.updateCategory(id, categoryDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Delete a category by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         try {

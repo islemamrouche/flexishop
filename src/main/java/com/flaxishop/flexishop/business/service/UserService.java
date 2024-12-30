@@ -1,5 +1,6 @@
 package com.flaxishop.flexishop.business.service;
 
+import com.flaxishop.flexishop.business.entity.Category;
 import com.flaxishop.flexishop.business.entity.User;
 import com.flaxishop.flexishop.business.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
         userRepository.delete(user);
+    }
+
+    public User getByUuid(String uuid) {
+        return userRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("User not found with UUID: " + uuid));
     }
 }

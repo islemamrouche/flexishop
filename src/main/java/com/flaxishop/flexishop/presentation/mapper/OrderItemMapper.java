@@ -3,12 +3,23 @@ package com.flaxishop.flexishop.presentation.mapper;
 import com.flaxishop.flexishop.business.entity.OrderItem;
 import com.flaxishop.flexishop.business.entity.Order;
 import com.flaxishop.flexishop.business.entity.Product;
+import com.flaxishop.flexishop.business.service.OrderService;
+import com.flaxishop.flexishop.business.service.ProductService;
 import com.flaxishop.flexishop.presentation.dto.OrderItemDTO;
 
 public class OrderItemMapper {
 
+    private final OrderService orderService;
+    private final ProductService productService;
+
+    // Constructor to inject service dependencies
+    public OrderItemMapper(OrderService orderService, ProductService productService) {
+        this.orderService = orderService;
+        this.productService = productService;
+    }
+
     // Method to convert OrderItem entity to OrderItemDTO
-    public static OrderItemDTO toOrderItemDTO(OrderItem orderItem) {
+    public OrderItemDTO toOrderItemDTO(OrderItem orderItem) {
         if (orderItem == null) {
             return null;
         }
@@ -25,7 +36,7 @@ public class OrderItemMapper {
     }
 
     // Method to convert OrderItemDTO back to OrderItem entity
-    public static OrderItem toOrderItemEntity(OrderItemDTO orderItemDTO) {
+    public OrderItem toOrderItemEntity(OrderItemDTO orderItemDTO) {
         if (orderItemDTO == null) {
             return null;
         }
@@ -37,13 +48,12 @@ public class OrderItemMapper {
         orderItem.setPrice(orderItemDTO.getPrice());
         orderItem.setTotalPrice(orderItemDTO.getTotalPrice());
 
-        // Map the orderUUID and productUUID to actual entities (you will need to implement logic for fetching these)
-        Order order = new Order();  // You will need to fetch the order by UUID
-        order.setUuid(orderItemDTO.getOrderUUID());
+        // Fetch the Order entity using the UUID from the DTO
+        Order order = orderService.getByUuid(orderItemDTO.getOrderUUID()); // Fetch the order by UUID
         orderItem.setOrder(order);
 
-        Product product = new Product();  // You will need to fetch the product by UUID
-        product.setUuid(orderItemDTO.getProductUUID());
+        // Fetch the Product entity using the UUID from the DTO
+        Product product = productService.getByUuid(orderItemDTO.getProductUUID()); // Fetch the product by UUID
         orderItem.setProduct(product);
 
         return orderItem;

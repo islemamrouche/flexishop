@@ -1,5 +1,6 @@
 package com.flaxishop.flexishop.business.service;
 
+import com.flaxishop.flexishop.business.entity.Category;
 import com.flaxishop.flexishop.business.entity.Payment;
 import com.flaxishop.flexishop.business.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
@@ -42,4 +43,9 @@ public class PaymentService {
                 .orElseThrow(() -> new RuntimeException("Payment not found with ID: " + id));
         paymentRepository.delete(payment);
     }
+    public Payment getByUuid(String uuid) {
+        return paymentRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("Payment not found with UUID: " + uuid));
+    }
+
 }

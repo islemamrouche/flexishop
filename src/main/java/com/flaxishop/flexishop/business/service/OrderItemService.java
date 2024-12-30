@@ -1,5 +1,7 @@
 package com.flaxishop.flexishop.business.service;
 
+import com.flaxishop.flexishop.business.entity.Category;
+import com.flaxishop.flexishop.business.entity.Order;
 import com.flaxishop.flexishop.business.entity.OrderItem;
 import com.flaxishop.flexishop.business.repository.OrderItemRepository;
 import org.springframework.stereotype.Service;
@@ -41,5 +43,10 @@ public class OrderItemService {
         OrderItem orderItem = orderItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("OrderItem not found with ID: " + id));
         orderItemRepository.delete(orderItem);
+    }
+
+    public OrderItem getByUuid(String uuid) {
+        return orderItemRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("OrderItem not found with UUID: " + uuid));
     }
 }

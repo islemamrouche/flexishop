@@ -1,5 +1,6 @@
 package com.flaxishop.flexishop.business.service;
 
+import com.flaxishop.flexishop.business.entity.Category;
 import com.flaxishop.flexishop.business.entity.Store;
 import com.flaxishop.flexishop.business.repository.StoreRepository;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,10 @@ public class StoreService {
         Store store = storeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Store not found with ID: " + id));
         storeRepository.delete(store);
+    }
+
+    public Store getByUuid(String uuid) {
+        return storeRepository.findByUuid(uuid)
+                .orElseThrow(() -> new RuntimeException("Store not found with UUID: " + uuid));
     }
 }
