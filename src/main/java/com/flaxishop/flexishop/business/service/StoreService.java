@@ -7,8 +7,14 @@ import com.flaxishop.flexishop.business.repository.StoreRepository;
 import com.flaxishop.flexishop.presentation.dto.StoreDTO;
 import com.flaxishop.flexishop.presentation.mapper.StoreMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,8 +22,15 @@ import java.util.stream.Collectors;
 @Service
 public class StoreService {
 
-    @Autowired
-    private StoreRepository storeRepository;
+    private final StoreRepository storeRepository;
+    private final String logoDirectory;
+
+
+    public StoreService(StoreRepository storeRepository, @Value("${store.logo.directory}") String logoDirectory) {
+        this.storeRepository = storeRepository;
+        this.logoDirectory = logoDirectory;
+    } // Change to your directory
+
 
     // Create a new store
     public StoreDTO createStore(StoreDTO storeDTO) {
@@ -71,6 +84,40 @@ public class StoreService {
         Store updatedStore = storeRepository.save(store);
         return StoreMapper.toDTO(updatedStore);
     }
+
+    public void uploadLogo(Long id, MultipartFile file) throws IOException {
+        Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
+
+        // Validate file type
+        if (!file.getContentType().startsWith("image/")) {
+            throw new IllegalArgumentException("Invalid file type. Only images are allowed.");
+        }
+
+        // Generate a unique filename
+        String filename = store.getUuid() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(logoDirectory, filename);
+
+        // Save the file to the directory
+        Files.createDirectories(filePath.getParent());
+        Files.write(filePath, file.getBytes());
+
+        // Save the file path in the database
+        store.setLogoPath(filePath.toString());
+        storeRepository.save(store);
+    }
+
+    public byte[] getLogo(Long id) throws IOException {
+        Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
+
+        // Read the file from the stored path
+        Path filePath = Paths.get(store.getLogoPath());
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("Logo file not found.");
+        }
+        return Files.readAllBytes(filePath);
+    }
+
+
 
     // Delete a store
     public void deleteStore(Long id) {

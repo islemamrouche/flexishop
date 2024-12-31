@@ -30,6 +30,9 @@ public class Store {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "logo_path")
+    private String logoPath;
+
     @Column(name = "store_url", unique = true)
     private String storeUrl;
 
@@ -39,6 +42,7 @@ public class Store {
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
+
 
     @PrePersist
     private void prePersist() {

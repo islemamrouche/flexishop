@@ -2,8 +2,10 @@ package com.flaxishop.flexishop.presentation.endpoint;
 
 import com.flaxishop.flexishop.business.service.StoreService;
 import com.flaxishop.flexishop.presentation.dto.StoreDTO;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,6 +48,30 @@ public class StoreController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PostMapping("/{id}/upload-logo")
+    public ResponseEntity<String> uploadLogo(@PathVariable Long id, @RequestParam MultipartFile file) {
+        try {
+            storeService.uploadLogo(id, file);
+            return ResponseEntity.ok("Logo uploaded successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to upload logo: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/logo")
+    public ResponseEntity<byte[]> getLogo(@PathVariable Long id) {
+        try {
+            byte[] logo = storeService.getLogo(id);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(logo);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
 
     // Update an existing store
     @PutMapping("/{id}")

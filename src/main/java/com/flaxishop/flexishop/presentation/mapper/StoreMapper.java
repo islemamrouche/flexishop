@@ -26,6 +26,7 @@ public class StoreMapper {
                 store.getUuid(),
                 store.getName(),
                 store.getStoreUrl(),
+                store.getLogoPath(),
                 store.getOwner() != null ? store.getOwner().getId() : null, // Extracting the owner ID
                 productUUIDList
         );
@@ -42,6 +43,7 @@ public class StoreMapper {
         store.setUuid(storeDTO.getUuid());
         store.setName(storeDTO.getName());
         store.setStoreUrl(storeDTO.getStoreUrl());
+        store.setLogoPath(storeDTO.getStoreUrl());
 
         // Map ownerId to a minimal User entity (fetch the full entity if necessary)
         if (storeDTO.getOwnerId() != null) {

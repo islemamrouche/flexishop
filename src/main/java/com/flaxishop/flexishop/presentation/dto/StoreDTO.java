@@ -16,6 +16,7 @@ public class StoreDTO {
     private String uuid;
     private String name;
     private String storeUrl;
+    private String logoPath;
     private Long ownerId; // Simplified reference to the owner (User)
     private List<String> productUUIDList; // Simplified list of associated product IDs
 }
