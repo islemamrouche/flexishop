@@ -48,12 +48,12 @@ public class ProductService {
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
 
-        // If you need to update the related store, implement that logic here.
-        if (productDTO.getStoreUUID() != null) {
-            Store store = new Store();
-            store.setUuid(productDTO.getStoreUUID());
-            product.setStore(store);
-        }
+// If you need to update the related store, implement that logic here.
+//        if (productDTO.getStoreUUID() != null) {
+//            Store store = new Store();
+//            store.setUuid(productDTO.getStoreUUID());
+//            product.setStore(store);
+//        }
 
         Product updatedProduct = productRepository.save(product);
         return ProductMapper.toDTO(updatedProduct);

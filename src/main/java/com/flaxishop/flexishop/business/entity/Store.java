@@ -23,21 +23,21 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "uuid", unique = true, nullable = false)
+
+    @Column(name = "uuid", unique = true)
     private String uuid;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "store_url", unique = true, nullable = false)
+    @Column(name = "store_url", unique = true)
     private String storeUrl;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 
     @PrePersist

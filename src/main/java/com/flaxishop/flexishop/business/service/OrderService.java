@@ -3,6 +3,7 @@ package com.flaxishop.flexishop.business.service;
 import com.flaxishop.flexishop.business.entity.Order;
 import com.flaxishop.flexishop.business.entity.Store;
 import com.flaxishop.flexishop.business.entity.User;
+import com.flaxishop.flexishop.business.enums.Status;
 import com.flaxishop.flexishop.business.repository.OrderRepository;
 import com.flaxishop.flexishop.presentation.dto.OrderDTO;
 import com.flaxishop.flexishop.presentation.mapper.OrderMapper;
@@ -47,7 +48,7 @@ public class OrderService {
 
         order.setOrderDate(orderDTO.getOrderDate());
         order.setTotalAmount(orderDTO.getTotalAmount());
-        order.setStatus(orderDTO.getStatus());
+        order.setStatus(Status.fromLabel(orderDTO.getStatus()));
 
         // If you need to update related entities like User and Store, you can implement that logic here.
         if (orderDTO.getUserId() != null) {

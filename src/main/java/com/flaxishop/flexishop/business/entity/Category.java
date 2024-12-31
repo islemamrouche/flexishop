@@ -23,11 +23,11 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "uuid", unique = true, nullable = false)
+
+    @Column(name = "uuid", unique = true)
     private String uuid;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

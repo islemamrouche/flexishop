@@ -23,28 +23,28 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "uuid", unique = true, nullable = false)
+
+    @Column(name = "uuid", unique = true)
     private String uuid;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
+
+    @Column(name = "name")
     private String name;
 
-    @NotNull
-    @Column(name = "description", nullable = false)
+
+    @Column(name = "description")
     private String description;
 
-    @NotNull
-    @Column(name = "price", nullable = false)
+
+    @Column(name = "price")
     private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "store_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "store_id", referencedColumnName = "id")
     private Store store;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")  // Name of the foreign key column
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @PrePersist

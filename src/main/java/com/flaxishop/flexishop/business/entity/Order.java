@@ -1,5 +1,6 @@
 package com.flaxishop.flexishop.business.entity;
 
+import com.flaxishop.flexishop.business.enums.Status;
 import com.flaxishop.flexishop.config.data.DBSchemas;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -24,27 +25,29 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "uuid", unique = true, nullable = false)
+
+    @Column(name = "uuid", unique = true)
     private String uuid;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "store_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "store_id", referencedColumnName = "id")
     private Store store;
 
-    @Column(name = "order_date", nullable = false)
+    @Column(name = "order_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date orderDate;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status = Status.PENDING;
 
     @PrePersist
     private void prePersist() {

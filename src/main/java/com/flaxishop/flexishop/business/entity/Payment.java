@@ -24,25 +24,25 @@ public class Payment {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @NotNull
-        @Column(name = "uuid", unique = true, nullable = false)
+    
+        @Column(name = "uuid", unique = true)
         private String uuid;
 
         @ManyToOne
-        @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = false)
+        @JoinColumn(name = "order_id", referencedColumnName = "id")
         private Order order;
 
-        @Column(name = "payment_date", nullable = false)
+        @Column(name = "payment_date")
         @Temporal(TemporalType.TIMESTAMP)
         private Date paymentDate;
 
-        @Column(name = "amount", nullable = false)
+        @Column(name = "amount")
         private BigDecimal amount;
 
-        @Column(name = "payment_method", nullable = false)
+        @Column(name = "payment_method")
         private String paymentMethod;
 
-        @Column(name = "status", nullable = false)
+        @Column(name = "status")
         private String status;  // e.g., "PENDING", "COMPLETED", etc.
 
         @PrePersist
