@@ -1,6 +1,5 @@
 package com.flaxishop.flexishop.business.service;
 
-import com.flaxishop.flexishop.business.entity.Category;
 import com.flaxishop.flexishop.business.entity.Product;
 import com.flaxishop.flexishop.business.entity.Store;
 import com.flaxishop.flexishop.business.repository.ProductRepository;
@@ -10,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -20,49 +19,48 @@ public class ProductService {
 
     // Create a new product
     public ProductDTO createProduct(ProductDTO productDTO) {
-        Product product = ProductMapper.toProductEntity(productDTO);
+        Product product = ProductMapper.toEntity(productDTO);
         Product savedProduct = productRepository.save(product);
-        return ProductMapper.toProductDTO(savedProduct);
-    }
-
-    // Get a product by its UUID
-    public ProductDTO getProductById(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-        return ProductMapper.toProductDTO(product);
-    }
-
-    // Update an existing product
-    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
-        Product existingProduct = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-        // Update the entity with values from DTO
-        existingProduct.setName(productDTO.getName());
-        existingProduct.setDescription(productDTO.getDescription());
-        existingProduct.setPrice(productDTO.getPrice());
-        existingProduct.setUuid(productDTO.getUuid());
-        // Update the store reference if needed (or fetch the store by UUID)
-        if (productDTO.getStoreUUID() != null) {
-            Store store = new Store();
-            store.setUuid(productDTO.getStoreUUID());
-            existingProduct.setStore(store);
-        }
-        Product updatedProduct = productRepository.save(existingProduct);
-        return ProductMapper.toProductDTO(updatedProduct);
-    }
-
-    // Delete a product by its ID
-    public void deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-        productRepository.delete(product);
+        return ProductMapper.toDTO(savedProduct);
     }
 
     // Get all products
     public List<ProductDTO> getAllProducts() {
         List<Product> products = productRepository.findAll();
-        return products.stream().map(ProductMapper::toProductDTO).collect(Collectors.toList());
+        return products.stream()
+                .map(ProductMapper::toDTO)
+                .toList();
     }
 
-    public Product getByUuid(String uuid) {
-        return productRepository.findByUuid(uuid)
-                .orElseThrow(() -> new RuntimeException("Product not found with UUID: " + uuid));
+    // Get a specific product by ID
+    public ProductDTO getProductById(Long id) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        return productOptional.map(ProductMapper::toDTO)
+                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
+    }
+
+    // Update a product
+    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
+
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+
+        // If you need to update the related store, implement that logic here.
+        if (productDTO.getStoreUUID() != null) {
+            Store store = new Store();
+            store.setUuid(productDTO.getStoreUUID());
+            product.setStore(store);
+        }
+
+        Product updatedProduct = productRepository.save(product);
+        return ProductMapper.toDTO(updatedProduct);
+    }
+
+    // Delete a product
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
     }
 }

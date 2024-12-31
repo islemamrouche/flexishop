@@ -8,7 +8,7 @@ import com.flaxishop.flexishop.presentation.dto.OrderItemDTO;
 public class OrderItemMapper {
 
     // Method to convert OrderItem entity to OrderItemDTO
-    public static OrderItemDTO toOrderItemDTO(OrderItem orderItem) {
+    public static OrderItemDTO toDTO(OrderItem orderItem) {
         if (orderItem == null) {
             return null;
         }
@@ -25,7 +25,7 @@ public class OrderItemMapper {
     }
 
     // Method to convert OrderItemDTO back to OrderItem entity
-    public static OrderItem toOrderItemEntity(OrderItemDTO orderItemDTO) {
+    public static OrderItem toEntity(OrderItemDTO orderItemDTO) {
         if (orderItemDTO == null) {
             return null;
         }

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class UserMapper {
 
     // Method to convert User entity to UserDTO
-    public static UserDTO toUserDTO(User user) {
+    public static UserDTO toDTO(User user) {
         if (user == null) {
             return null;
         }
@@ -41,7 +41,7 @@ public class UserMapper {
     }
 
     // Method to convert UserDTO back to User entity
-    public static User toUserEntity(UserDTO userDTO) {
+    public static User toEntity(UserDTO userDTO) {
         if (userDTO == null) {
             return null;
         }

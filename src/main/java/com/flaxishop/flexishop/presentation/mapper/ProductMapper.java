@@ -7,7 +7,7 @@ import com.flaxishop.flexishop.presentation.dto.ProductDTO;
 public class ProductMapper {
 
     // Method to convert Product entity to ProductDTO
-    public static ProductDTO toProductDTO(Product product) {
+    public static ProductDTO toDTO(Product product) {
         if (product == null) {
             return null;
         }
@@ -23,7 +23,7 @@ public class ProductMapper {
     }
 
     // Method to convert ProductDTO back to Product entity
-    public static Product toProductEntity(ProductDTO productDTO) {
+    public static Product toEntity(ProductDTO productDTO) {
         if (productDTO == null) {
             return null;
         }

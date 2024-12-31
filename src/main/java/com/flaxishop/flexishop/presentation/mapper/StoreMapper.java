@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class StoreMapper {
 
     // Method to convert Store entity to StoreDTO
-    public static StoreDTO toStoreDTO(Store store) {
+    public static StoreDTO toDTO(Store store) {
         if (store == null) {
             return null;
         }
@@ -32,7 +32,7 @@ public class StoreMapper {
     }
 
     // Method to convert StoreDTO back to Store entity
-    public static Store toStoreEntity(StoreDTO storeDTO) {
+    public static Store toEntity(StoreDTO storeDTO) {
         if (storeDTO == null) {
             return null;
         }

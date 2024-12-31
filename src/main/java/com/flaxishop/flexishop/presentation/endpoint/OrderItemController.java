@@ -1,5 +1,7 @@
-import com.flaxishop.flexishop.business.entity.OrderItem;
+package com.flaxishop.flexishop.presentation.endpoint;
+
 import com.flaxishop.flexishop.business.service.OrderItemService;
+import com.flaxishop.flexishop.presentation.dto.OrderItemDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,43 +13,52 @@ public class OrderItemController {
 
     private final OrderItemService orderItemService;
 
+    // Constructor injection for the service
     public OrderItemController(OrderItemService orderItemService) {
         this.orderItemService = orderItemService;
     }
 
+    // Get all order items
     @GetMapping
-    public List<OrderItem> getAllOrderItems() {
-        return orderItemService.getAllOrderItems();
+    public ResponseEntity<List<OrderItemDTO>> getAllOrderItems() {
+        List<OrderItemDTO> orderItems = orderItemService.getAllOrderItems();
+        return ResponseEntity.ok(orderItems);
     }
 
+    // Get a specific order item by its ID
     @GetMapping("/{id}")
-    public ResponseEntity<OrderItem> getOrderItemById(@PathVariable Long id) {
+    public ResponseEntity<OrderItemDTO> getOrderItemById(@PathVariable Long id) {
         try {
-            OrderItem orderItem = orderItemService.getOrderItemById(id);
-            return ResponseEntity.ok(orderItem);
+            OrderItemDTO orderItemDTO = orderItemService.getOrderItemById(id);
+            return ResponseEntity.ok(orderItemDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Create a new order item
     @PostMapping
-    public ResponseEntity<OrderItem> createOrderItem(@RequestBody OrderItem orderItem) {
+    public ResponseEntity<OrderItemDTO> createOrderItem(@RequestBody OrderItemDTO orderItemDTO) {
         try {
-            return ResponseEntity.ok(orderItemService.createOrderItem(orderItem));
+            OrderItemDTO createdOrderItem = orderItemService.createOrderItem(orderItemDTO);
+            return ResponseEntity.status(201).body(createdOrderItem);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
+    // Update an existing order item
     @PutMapping("/{id}")
-    public ResponseEntity<OrderItem> updateOrderItem(@PathVariable Long id, @RequestBody OrderItem orderItemDetails) {
+    public ResponseEntity<OrderItemDTO> updateOrderItem(@PathVariable Long id, @RequestBody OrderItemDTO orderItemDTO) {
         try {
-            return ResponseEntity.ok(orderItemService.updateOrderItem(id, orderItemDetails));
+            OrderItemDTO updatedOrderItem = orderItemService.updateOrderItem(id, orderItemDTO);
+            return ResponseEntity.ok(updatedOrderItem);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Delete an order item by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrderItem(@PathVariable Long id) {
         try {

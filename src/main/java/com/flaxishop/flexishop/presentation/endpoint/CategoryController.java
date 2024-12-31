@@ -1,7 +1,10 @@
 package com.flaxishop.flexishop.presentation.endpoint;
 
 import com.flaxishop.flexishop.business.service.CategoryService;
+import com.flaxishop.flexishop.config.data.exceptions.EntityNotFoundException;
 import com.flaxishop.flexishop.presentation.dto.CategoryDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,57 +14,64 @@ import java.util.List;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    private final CategoryService categoryService;
-
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
+    @Autowired
+    private CategoryService categoryService;
 
     // Get all categories
     @GetMapping
-    public List<CategoryDTO> getAllCategories() {
-        return categoryService.getAllCategories();
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+        List<CategoryDTO> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
 
-    // Get category by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
+    // Get a category by its ID
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long categoryId) {
         try {
-            CategoryDTO categoryDTO = categoryService.getCategoryById(id);
+            CategoryDTO categoryDTO = categoryService.getCategoryById(categoryId);
             return ResponseEntity.ok(categoryDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // Get a category by its UUID
+    @GetMapping("/uuid/{uuid}")
+    public ResponseEntity<CategoryDTO> getCategoryByUuid(@PathVariable String uuid) {
+        try {
+            CategoryDTO categoryDTO = categoryService.getCategoryByUuid(uuid);
+            return ResponseEntity.ok(categoryDTO);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     // Create a new category
     @PostMapping
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        try {
-            return ResponseEntity.ok(categoryService.createCategory(categoryDTO));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        CategoryDTO createdCategory = categoryService.createCategory(categoryDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
     // Update an existing category
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long categoryId, @RequestBody CategoryDTO categoryDTO) {
         try {
-            return ResponseEntity.ok(categoryService.updateCategory(id, categoryDTO));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            CategoryDTO updatedCategory = categoryService.updateCategory(categoryId, categoryDTO);
+            return ResponseEntity.ok(updatedCategory);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
-    // Delete a category by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    // Delete a category by its ID
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         try {
-            categoryService.deleteCategory(id);
+            categoryService.deleteCategory(categoryId);
             return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

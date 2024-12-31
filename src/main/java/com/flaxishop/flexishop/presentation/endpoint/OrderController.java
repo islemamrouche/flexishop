@@ -1,7 +1,7 @@
 package com.flaxishop.flexishop.presentation.endpoint;
 
-import com.flaxishop.flexishop.business.entity.Order;
 import com.flaxishop.flexishop.business.service.OrderService;
+import com.flaxishop.flexishop.presentation.dto.OrderDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,43 +13,52 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // Constructor injection for the service
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
+    // Get all orders
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        List<OrderDTO> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
     }
 
+    // Get a specific order by its ID
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
         try {
-            Order order = orderService.getOrderById(id);
-            return ResponseEntity.ok(order);
+            OrderDTO orderDTO = orderService.getOrderById(id);
+            return ResponseEntity.ok(orderDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Create a new order
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         try {
-            return ResponseEntity.ok(orderService.createOrder(order));
+            OrderDTO createdOrder = orderService.createOrder(orderDTO);
+            return ResponseEntity.status(201).body(createdOrder);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
+    // Update an existing order
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
         try {
-            return ResponseEntity.ok(orderService.updateOrder(id, orderDetails));
+            OrderDTO updatedOrder = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(updatedOrder);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Delete an order by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         try {

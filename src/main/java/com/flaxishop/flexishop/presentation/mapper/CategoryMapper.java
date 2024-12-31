@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class CategoryMapper {
 
     // Method to convert Category entity to CategoryDTO
-    public static CategoryDTO toCategoryDTO(Category category) {
+    public static CategoryDTO toDTO(Category category) {
         if (category == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public class CategoryMapper {
     }
 
     // Method to convert CategoryDTO back to Category entity
-    public static Category toCategoryEntity(CategoryDTO categoryDTO) {
+    public static Category toEntity(CategoryDTO categoryDTO) {
         if (categoryDTO == null) {
             return null;
         }

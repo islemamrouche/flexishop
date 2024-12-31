@@ -1,9 +1,7 @@
-package com.flaxishop.flexishop.presentation.controller;
+package com.flaxishop.flexishop.presentation.endpoint;
 
 import com.flaxishop.flexishop.business.service.ProductService;
 import com.flaxishop.flexishop.presentation.dto.ProductDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,41 +11,61 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    // Create a new product
-    @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
-        ProductDTO createdProduct = productService.createProduct(productDTO);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
-    }
-
-    // Get a product by ID
-    @GetMapping("/{productId}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
-        ProductDTO productDTO = productService.getProductById(productId);
-        return new ResponseEntity<>(productDTO, HttpStatus.OK);
-    }
-
-    // Update an existing product
-    @PutMapping("/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductDTO productDTO) {
-        ProductDTO updatedProduct = productService.updateProduct(productId, productDTO);
-        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
-    }
-
-    // Delete a product by ID
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
-        productService.deleteProduct(productId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    // Constructor injection for the service
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     // Get all products
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        List<ProductDTO> productDTOs = productService.getAllProducts();
-        return new ResponseEntity<>(productDTOs, HttpStatus.OK);
+        List<ProductDTO> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    // Get a specific product by its ID
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
+        try {
+            ProductDTO productDTO = productService.getProductById(id);
+            return ResponseEntity.ok(productDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Create a new product
+    @PostMapping
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+        try {
+            ProductDTO createdProduct = productService.createProduct(productDTO);
+            return ResponseEntity.status(201).body(createdProduct);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // Update an existing product
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+        try {
+            ProductDTO updatedProduct = productService.updateProduct(id, productDTO);
+            return ResponseEntity.ok(updatedProduct);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Delete a product by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
