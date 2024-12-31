@@ -15,8 +15,9 @@ public class CategoryMapper {
             return null;
         }
 
+        // Convert associated Product entities to their UUIDs
         List<String> productUUIDList = category.getProducts().stream()
-                .map(Product::getUuid) // Get the UUID of each product
+                .map(Product::getUuid)
                 .collect(Collectors.toList());
 
         return new CategoryDTO(
@@ -33,14 +34,13 @@ public class CategoryMapper {
             return null;
         }
 
-        // If needed, you can implement logic to map productUUIDList to actual Product entities.
-        // However, since this is a minimal representation, we'll just leave it as a placeholder.
-
         Category category = new Category();
         category.setId(categoryDTO.getId());
         category.setUuid(categoryDTO.getUuid());
         category.setName(categoryDTO.getName());
-        // productUUIDList is not being used in this case to set products, but you can add that logic if required
+
+        // If necessary, logic to fetch or map Product entities by their UUIDs can be added here.
+        // This is left as a placeholder for now, as it depends on your application's needs.
 
         return category;
     }

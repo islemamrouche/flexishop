@@ -1,8 +1,8 @@
 package com.flaxishop.flexishop.presentation.mapper;
 
 import com.flaxishop.flexishop.business.entity.Order;
-import com.flaxishop.flexishop.business.entity.User;
 import com.flaxishop.flexishop.business.entity.Store;
+import com.flaxishop.flexishop.business.entity.User;
 import com.flaxishop.flexishop.presentation.dto.OrderDTO;
 
 public class OrderMapper {
@@ -16,8 +16,8 @@ public class OrderMapper {
         return new OrderDTO(
                 order.getId(),
                 order.getUuid(),
-                order.getUser() != null ? order.getUser().getId() : null,  // Extracting the simplified user ID
-                order.getStore() != null ? order.getStore().getId() : null,  // Extracting the simplified store ID
+                order.getUser() != null ? order.getUser().getId() : null, // Extract User ID
+                order.getStore() != null ? order.getStore().getId() : null, // Extract Store ID
                 order.getOrderDate(),
                 order.getTotalAmount(),
                 order.getStatus()
@@ -37,14 +37,18 @@ public class OrderMapper {
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setStatus(orderDTO.getStatus());
 
-        // Map the userId and storeId to actual entities (you will need to implement logic for fetching these)
-        User user = new User();  // You will need to fetch the user by ID
-        user.setId(orderDTO.getUserId());
-        order.setUser(user);
+        // Map userId and storeId to actual entities (if necessary, fetch them via service)
+        if (orderDTO.getUserId() != null) {
+            User user = new User();
+            user.setId(orderDTO.getUserId());
+            order.setUser(user);
+        }
 
-        Store store = new Store();  // You will need to fetch the store by ID
-        store.setId(orderDTO.getStoreId());
-        order.setStore(store);
+        if (orderDTO.getStoreId() != null) {
+            Store store = new Store();
+            store.setId(orderDTO.getStoreId());
+            order.setStore(store);
+        }
 
         return order;
     }

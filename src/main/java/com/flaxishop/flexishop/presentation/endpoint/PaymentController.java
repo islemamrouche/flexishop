@@ -1,3 +1,5 @@
+package com.flaxishop.flexishop.presentation.endpoint;
+
 import com.flaxishop.flexishop.business.entity.Payment;
 import com.flaxishop.flexishop.business.service.PaymentService;
 import org.springframework.http.ResponseEntity;

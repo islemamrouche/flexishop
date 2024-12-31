@@ -1,7 +1,7 @@
 package com.flaxishop.flexishop.presentation.mapper;
 
-import com.flaxishop.flexishop.business.entity.Payment;
 import com.flaxishop.flexishop.business.entity.Order;
+import com.flaxishop.flexishop.business.entity.Payment;
 import com.flaxishop.flexishop.presentation.dto.PaymentDTO;
 
 public class PaymentMapper {
@@ -15,10 +15,10 @@ public class PaymentMapper {
         return new PaymentDTO(
                 payment.getId(),
                 payment.getUuid(),
-                payment.getOrder() != null ? payment.getOrder().getId() : null, // Extracting the simplified order ID
+                payment.getOrder() != null ? payment.getOrder().getId() : null, // Extracting the associated order ID
                 payment.getPaymentDate(),
                 payment.getAmount(),
-                payment.getUuid(),  // Payment UUID is mapped directly
+                payment.getUuid(),
                 payment.getStatus()
         );
     }
@@ -32,14 +32,17 @@ public class PaymentMapper {
         Payment payment = new Payment();
         payment.setId(paymentDTO.getId());
         payment.setUuid(paymentDTO.getUuid());
-        payment.setAmount(paymentDTO.getAmount());
         payment.setPaymentDate(paymentDTO.getPaymentDate());
+        payment.setAmount(paymentDTO.getAmount());
+        payment.setUuid(paymentDTO.getPaymentUUID());
         payment.setStatus(paymentDTO.getStatus());
 
-        // Map the orderId to the actual Order entity (you will need to implement logic for fetching it)
-        Order order = new Order();  // You will need to fetch the order by ID
-        order.setId(paymentDTO.getOrderId());
-        payment.setOrder(order);
+        // Map the orderId to an Order entity (fetch the full entity if necessary)
+        if (paymentDTO.getOrderId() != null) {
+            Order order = new Order();
+            order.setId(paymentDTO.getOrderId());
+            payment.setOrder(order);
+        }
 
         return payment;
     }

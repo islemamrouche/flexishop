@@ -18,7 +18,7 @@ public class ProductMapper {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getStore() != null ? product.getStore().getUuid() : null // Simplified store reference
+                product.getStore() != null ? product.getStore().getUuid() : null // Extracting the store UUID
         );
     }
 
@@ -35,10 +35,10 @@ public class ProductMapper {
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
 
-        // Handle store (assumed you can fetch the store by UUID or set it directly)
+        // Map the storeUUID to a Store entity (fetch the full entity if necessary)
         if (productDTO.getStoreUUID() != null) {
             Store store = new Store();
-            store.setUuid(productDTO.getStoreUUID());  // Assumed that store can be fetched by UUID
+            store.setUuid(productDTO.getStoreUUID());
             product.setStore(store);
         }
 
