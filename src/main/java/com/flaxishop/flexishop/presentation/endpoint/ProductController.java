@@ -41,6 +41,7 @@ public class ProductController {
     public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
         try {
             ProductDTO createdProduct = productService.createProduct(productDTO);
+            System.out.println("the created product "+createdProduct);
             return ResponseEntity.status(201).body(createdProduct);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();

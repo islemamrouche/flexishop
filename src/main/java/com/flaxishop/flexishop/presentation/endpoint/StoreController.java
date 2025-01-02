@@ -71,8 +71,6 @@ public class StoreController {
     }
 
 
-
-
     // Update an existing store
     @PutMapping("/{id}")
     public ResponseEntity<StoreDTO> updateStore(@PathVariable Long id, @RequestBody StoreDTO storeDTO) {

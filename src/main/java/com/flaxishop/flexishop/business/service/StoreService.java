@@ -6,7 +6,6 @@ import com.flaxishop.flexishop.business.entity.User;
 import com.flaxishop.flexishop.business.repository.StoreRepository;
 import com.flaxishop.flexishop.presentation.dto.StoreDTO;
 import com.flaxishop.flexishop.presentation.mapper.StoreMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,14 +89,24 @@ public class StoreService {
     public void uploadLogo(Long id, MultipartFile file) throws IOException {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
 
-        // Validate file type
-        if (!file.getContentType().startsWith("image/")) {
+        // Validate file type (allowing jpg, jpeg, png)
+        String contentType = file.getContentType();
+        if (contentType != null && !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("Invalid file type. Only images are allowed.");
         }
 
-        // Generate a unique filename
-        String filename = store.getUuid() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(logoDirectory, filename);
+        // Ensure file has a valid image extension (jpg, jpeg, png)
+        String filename = file.getOriginalFilename();
+        if (filename != null && !(filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".png"))) {
+            throw new IllegalArgumentException("Invalid file format. Only JPG, JPEG, or PNG files are allowed.");
+        }
+
+        // Generate a unique filename with current date and time
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss");
+        String timestamp = LocalDateTime.now().format(formatter);
+        String uniqueFilename = timestamp + "_" + filename;
+
+        Path filePath = Paths.get(logoDirectory, uniqueFilename);
 
         // Save the file to the directory
         Files.createDirectories(filePath.getParent());
@@ -105,6 +116,7 @@ public class StoreService {
         store.setLogoPath(filePath.toString());
         storeRepository.save(store);
     }
+
 
     public byte[] getLogo(Long id) throws IOException {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
@@ -116,7 +128,6 @@ public class StoreService {
         }
         return Files.readAllBytes(filePath);
     }
-
 
 
     // Delete a store
