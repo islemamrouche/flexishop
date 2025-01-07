@@ -1,12 +1,17 @@
 package com.flaxishop.flexishop.config.initializers;
 
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class KeycloakInitializer {
@@ -28,13 +33,14 @@ public class KeycloakInitializer {
         return args -> {
             try {
                 // Authenticate using client credentials
-                Keycloak keycloak = Keycloak.getInstance(
-                        authServerUrl,
-                        realm,
-                        clientId,
-                        clientSecret,
-                        clientId
-                );
+                Keycloak keycloak = KeycloakBuilder.builder()
+                        .serverUrl(authServerUrl)
+                        .realm(realm)
+                        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                        .clientId(clientId)
+                        .clientSecret(clientSecret)
+                        .build();
+
 
                 // Access the groups resource in the Keycloak realm
                 GroupsResource groupsResource = keycloak.realm(realm).groups();
@@ -44,7 +50,7 @@ public class KeycloakInitializer {
                 createGroupIfNotExists(groupsResource, "customer");
 
             } catch (Exception e) {
-                e.printStackTrace(); // Add proper logging and exception handling here
+                e.printStackTrace();
             }
         };
     }
