@@ -6,14 +6,19 @@ import com.flaxishop.flexishop.business.entity.User;
 import com.flaxishop.flexishop.business.repository.StoreRepository;
 import com.flaxishop.flexishop.presentation.dto.StoreDTO;
 import com.flaxishop.flexishop.presentation.mapper.StoreMapper;
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.errors.MinioException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -24,14 +29,16 @@ import java.util.stream.Collectors;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final String logoDirectory;
+    private final MinioClient minioClient;
+    private final String bucketName; // Name of the bucket where logos will be stored
 
 
-    public StoreService(StoreRepository storeRepository, @Value("${store.logo.directory}") String logoDirectory) {
+    public StoreService(StoreRepository storeRepository, MinioClient minioClient,
+                        @Value("${minio.bucket-name}") String bucketName) {
         this.storeRepository = storeRepository;
-        this.logoDirectory = logoDirectory;
-    } // Change to your directory
-
+        this.minioClient = minioClient;
+        this.bucketName = bucketName;
+    }
 
     // Create a new store
     public StoreDTO createStore(StoreDTO storeDTO) {
@@ -86,7 +93,8 @@ public class StoreService {
         return StoreMapper.toDTO(updatedStore);
     }
 
-    public void uploadLogo(Long id, MultipartFile file) throws IOException {
+    // Upload the logo to MinIO
+    public void uploadLogo(Long id, MultipartFile file) throws IOException, MinioException {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
 
         // Validate file type (allowing jpg, jpeg, png)
@@ -106,29 +114,68 @@ public class StoreService {
         String timestamp = LocalDateTime.now().format(formatter);
         String uniqueFilename = timestamp + "_" + filename;
 
-        Path filePath = Paths.get(logoDirectory, uniqueFilename);
+        try {
+            // Use MinIO to upload the file
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(uniqueFilename)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(contentType)
+                            .build()
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload logo: I/O error occurred while reading the file.", e);
+        } catch (MinioException e) {
+            throw new RuntimeException("Failed to upload logo: MinIO-specific error occurred.", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to upload logo: No such algorithm error occurred when processing the file.", e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException("Failed to upload logo: Invalid key error occurred while connecting to MinIO.", e);
+        }
 
-        // Save the file to the directory
-        Files.createDirectories(filePath.getParent());
-        Files.write(filePath, file.getBytes());
 
-        // Save the file path in the database
-        store.setLogoPath(filePath.toString());
+        // Save the file path (which is the filename in MinIO) in the database
+        store.setLogoPath(uniqueFilename);  // You can store just the filename or full MinIO URL
         storeRepository.save(store);
     }
 
 
-    public byte[] getLogo(Long id) throws IOException {
+    // Retrieve the logo from MinIO
+    public byte[] getLogo(Long id) throws IOException, MinioException {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
 
-        // Read the file from the stored path
-        Path filePath = Paths.get(store.getLogoPath());
-        if (!Files.exists(filePath)) {
-            throw new RuntimeException("Logo file not found.");
+        // Get the file from MinIO
+        String filename = store.getLogoPath();
+        if (filename == null) {
+            throw new RuntimeException("Logo not found for the store.");
         }
-        return Files.readAllBytes(filePath);
-    }
 
+        // Download the file from MinIO
+        try {
+            // Use MinIO to get the object
+            GetObjectResponse response = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(filename)
+                            .build()
+            );
+
+            // Now you can work with the response's input stream
+            InputStream inputStream = response;
+            byte[] data = inputStream.readAllBytes();
+            return data;
+        } catch (MinioException e) {
+            throw new RuntimeException("Failed to retrieve object from MinIO.", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read object data.", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     // Delete a store
     public void deleteStore(Long id) {
